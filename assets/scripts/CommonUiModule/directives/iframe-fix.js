@@ -18,16 +18,16 @@ $(document).ready(function(){
    * and then fetches the sources (it will try to get the topmost
    * <section, failing that the whole body)
    */
-  let shouldCheckIframes = false;
-  const thisOften = 2000;
-  const loadedFlag = "loaded";
+  var shouldCheckIframes = false;
+  var thisOften = 2000;
+  var loadedFlag = "loaded";
 
   setTimeout(copyMarkupFromIframes, thisOften * 3);
 
   function copyMarkupFromIframes() {
     shouldCheckIframes = false;
-    $(`iframe[id^='ifrm_']:not([${loadedFlag}])`).each((n, iframe) => {
-      const iframeDoc = iframe.contentWindow.document;
+    $('iframe[id^="ifrm_"]:not([' + loadedFlag + '])').each(function(n, iframe) {
+      var iframeDoc = iframe.contentWindow.document;
       if (iframeDoc.readyState === "loading") {
         shouldCheckIframes = true;
       }
@@ -36,9 +36,9 @@ $(document).ready(function(){
         iframe.setAttribute(loadedFlag, true);
 
         // clone node so that we can throw away all the stuff we don't need
-        const $markupClone = $(iframe.contentWindow.document.body).find("section").length > 0
+        const $markupClone = $(iframe.contentWindow.document.body).find('section').length > 0
           ? $(iframe.contentWindow.document.body)
-            .find("section")
+            .find('section')
             .first()
           : $(iframe.contentWindow.document.body).clone();
 
@@ -57,20 +57,20 @@ $(document).ready(function(){
 
         // here we put the markup we want to show in the 'show example' div,
         $(iframe)
-          .parents("div.wb-content-grid__row")
+          .parents('div.wb-content-grid__row')
           .next()
-          .find(".SG-component__markup")
+          .find('.SG-component__markup')
           .get(0).innerHTML = syntaxHighlightedHTML;
 
         // here we put the markup we want to show in the 'copy markup' button,
         $(iframe)
-          .parents("div.wb-content-grid__row")
+          .parents('div.wb-content-grid__row')
           .prev().prev()
-          .find("[data-d-copy]")
-          .attr("data-clipboard-text", html);
+          .find('[data-d-copy]')
+          .attr('data-clipboard-text', html);
 
         // remove vertical scrollbars in the  iframe
-        $(iframe.contentWindow.document.body).css({ overflowY: "hidden"});
+        $(iframe.contentWindow.document.body).css({ overflowY: 'hidden'});
       }
     });
 
