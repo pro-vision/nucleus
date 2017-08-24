@@ -39,6 +39,9 @@ Substitute.injectConfig = function ( config ) {
     // no path
     this.templatePath = process.cwd();
   }
+  this.iframePath = config.iframePath
+    ? config.iframePath + '/'
+    : '';
   return this;
 };
 
@@ -145,6 +148,26 @@ Substitute.methods.template = function ( selector = '') {
     Verbose.warn('unknown_template', [filePath, selector, this.templatePath]);
     return '';
   }
-}
+};
+
+Substitute.methods.iframe = function ( url = '', width, height) {
+  url = `${this.iframePath}${url.trim()}`.replace(/([^:])\/{2,}/g, "$1/");
+  // not using default parameters because calling substitution
+  // @{iframe:url::111} will pass an empty string to width,
+  // which needs one of the below anyway - therefore let's just
+  // do them all here
+  width = width || '100%';
+  height = height || '100vh';
+  if (url) {
+    var id = `ifrm_${String(Math.random()).substr(3)}`;
+    return `
+    <iframe class="nuclueus-iframe" id="${id}" style="width: ${width}; height: ${height};" src="${url}"></iframe>
+    `;
+  }
+  else {
+    Verbose.warn('no_iframe_url', []);
+    return ''
+  }
+};
 
 module.exports = Substitute;

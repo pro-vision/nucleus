@@ -78,4 +78,11 @@ module.exports = {
         'Make sure the file really exists and check templatePath '+templatePath+' in the config'
     };
   },
+  // Whenever we try to substitute with unknown  markup template.
+  'no_iframe_url': function () {
+    return {
+      'title': 'iframe substitution called without URL',
+      'text': 'You try to substitute with @{iframe:url:height:width}, but did not pass a URL '
+    };
+  },
 };
