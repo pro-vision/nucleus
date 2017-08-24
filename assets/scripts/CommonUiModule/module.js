@@ -15,3 +15,4 @@ require('./directives/code-preview-toggle');
 require('./directives/copy-button');
 require('./directives/search-box');
 require('./directives/search-box-trigger');
+require('./directives/iframe-fix');

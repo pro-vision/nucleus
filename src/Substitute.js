@@ -39,6 +39,9 @@ Substitute.injectConfig = function ( config ) {
     // no path
     this.templatePath = process.cwd();
   }
+  this.iframePath = config.iframePath
+    ? config.iframePath + '/'
+    : '';
   return this;
 };
 
@@ -148,7 +151,7 @@ Substitute.methods.template = function ( selector = '') {
 };
 
 Substitute.methods.iframe = function ( url = '', width, height) {
-  url = url.trim();
+  url = `${this.iframePath}${url.trim()}`.replace(/([^:])\/{2,}/g, "$1/");
   // not using default parameters because calling substitution
   // @{iframe:url::111} will pass an empty string to width,
   // which needs one of the below anyway - therefore let's just

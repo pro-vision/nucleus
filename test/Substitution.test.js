@@ -58,6 +58,31 @@ describe('Substitution', function () {
   });
 
 
+    /********************************************************/
+
+    it('includes templates', function () {
+      var markup = 'Test @{template: assets/test-fixtures/substitition-template.html}';
+      Substitute.injectConfig({});
+      var subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{template') === -1);
+      assert.ok(/---TEMPLATE---$/.test(subs));
+
+      markup = 'Test @{template: substitition-template.html}';
+      Substitute.injectConfig({
+        templatePath: 'assets/test-fixtures'
+      });
+      var subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{template') === -1);
+      assert.ok(/---TEMPLATE---$/.test(subs));
+
+      markup = 'Test @{template: random-file.txt}';
+      Substitute.injectConfig({});
+      var subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{template') === -1);
+      assert.ok(!/---TEMPLATE---$/.test(subs));
+    });
+
+
   /********************************************************/
 
   it('includes templates', function () {
@@ -80,5 +105,64 @@ describe('Substitution', function () {
     var subs = Substitute.substitute(markup);
     assert.ok(subs.indexOf('{template') === -1);
     assert.ok(!/---TEMPLATE---$/.test(subs));
+  });
+
+
+  /********************************************************/
+
+  it('includes iframes', function () {
+    // quotation marks for regex
+    const quot = `['"]`;
+    const url = '/components/test.html';
+    const host = 'http://example.com';
+    const DEFAULT_WIDTH = '100%';
+    const DEFAULT_HEIGHT = '100vh';
+    var markup, subs;
+
+    markup = `Test @{iframe: ${url}}`;
+    Substitute.injectConfig({});
+    subs = Substitute.substitute(markup);
+    assert.ok(subs.indexOf('{iframe') === -1);
+    assert.ok(/<iframe/.test(subs));
+    assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
+    assert.ok(RegExp(`width:\\s*${DEFAULT_WIDTH}`).test(subs));
+    assert.ok(RegExp(`height:\\s*${DEFAULT_HEIGHT}`).test(subs));
+
+    markup = `Test @{iframe: ${url}}`;
+    Substitute.injectConfig({
+      iframePath: host
+    });
+    subs = Substitute.substitute(markup);
+    assert.ok(subs.indexOf('{iframe') === -1);
+    assert.ok(/<iframe/.test(subs));
+    assert.ok(RegExp(`src=${quot}${host}${url}${quot}`).test(subs));
+
+    markup = `Test @{iframe: /${url}}`;
+    Substitute.injectConfig({
+      iframePath: host + '/'
+    });
+    subs = Substitute.substitute(markup);
+    assert.ok(subs.indexOf('{iframe') === -1);
+    assert.ok(/<iframe/.test(subs));
+    assert.ok(RegExp(`src=${quot}${host}${url}${quot}`).test(subs));
+
+    markup = `Test @{iframe: ${url}::hhh}`;
+    Substitute.injectConfig({});
+    subs = Substitute.substitute(markup);
+    assert.ok(subs.indexOf('{iframe') === -1);
+    assert.ok(/<iframe/.test(subs));
+    assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
+    assert.ok(RegExp(`width:\\s*${DEFAULT_WIDTH}`).test(subs));
+    assert.ok(RegExp(`height:\\s*hhh`).test(subs));
+
+    markup = `Test @{iframe: ${url}:wwww:hhhh}`;
+    Substitute.injectConfig({});
+    subs = Substitute.substitute(markup);
+    assert.ok(subs.indexOf('{iframe') === -1);
+    assert.ok(/<iframe/.test(subs));
+    assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
+    assert.ok(RegExp(`width:\\s*wwww`).test(subs));
+    assert.ok(RegExp(`height:\\s*hhhh`).test(subs));
+
   });
 });
