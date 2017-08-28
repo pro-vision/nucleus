@@ -110,59 +110,92 @@ describe('Substitution', function () {
 
   /********************************************************/
 
-  it('includes iframes', function () {
+  describe('iframes / ', function () {
     // quotation marks for regex
     const quot = `['"]`;
     const url = '/components/test.html';
     const host = 'http://example.com';
     const DEFAULT_WIDTH = '100%';
     const DEFAULT_HEIGHT = '100vh';
+    // returns data-markup-selector="sel"
+    const selectorRegex = (sel = '') => RegExp(`data-markup-selector=${quot}${sel}${quot}`);
     var markup, subs;
 
-    markup = `Test @{iframe: ${url}}`;
-    Substitute.injectConfig({});
-    subs = Substitute.substitute(markup);
-    assert.ok(subs.indexOf('{iframe') === -1);
-    assert.ok(/<iframe/.test(subs));
-    assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
-    assert.ok(RegExp(`width:\\s*${DEFAULT_WIDTH}`).test(subs));
-    assert.ok(RegExp(`height:\\s*${DEFAULT_HEIGHT}`).test(subs));
-
-    markup = `Test @{iframe: ${url}}`;
-    Substitute.injectConfig({
-      iframePath: host
+    it("inserts defaults", function () {
+      markup = `Test @{iframe: ${url}}`;
+      Substitute.injectConfig({});
+      subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{iframe') === -1);
+      assert.ok(/<iframe/.test(subs));
+      assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
+      assert.ok(RegExp(`width:\\s*${DEFAULT_WIDTH}`).test(subs));
+      assert.ok(RegExp(`height:\\s*${DEFAULT_HEIGHT}`).test(subs));
+      assert.ok(selectorRegex().test(subs));
     });
-    subs = Substitute.substitute(markup);
-    assert.ok(subs.indexOf('{iframe') === -1);
-    assert.ok(/<iframe/.test(subs));
-    assert.ok(RegExp(`src=${quot}${host}${url}${quot}`).test(subs));
 
-    markup = `Test @{iframe: /${url}}`;
-    Substitute.injectConfig({
-      iframePath: host + '/'
+    it("uses iframePath", function () {
+      markup = `Test @{iframe: ${url}}`;
+      Substitute.injectConfig({
+        iframePath: host
+      });
+      subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{iframe') === -1);
+      assert.ok(/<iframe/.test(subs));
+      assert.ok(RegExp(`src=${quot}${host}${url}${quot}`).test(subs));
     });
-    subs = Substitute.substitute(markup);
-    assert.ok(subs.indexOf('{iframe') === -1);
-    assert.ok(/<iframe/.test(subs));
-    assert.ok(RegExp(`src=${quot}${host}${url}${quot}`).test(subs));
 
-    markup = `Test @{iframe: ${url}::hhh}`;
-    Substitute.injectConfig({});
-    subs = Substitute.substitute(markup);
-    assert.ok(subs.indexOf('{iframe') === -1);
-    assert.ok(/<iframe/.test(subs));
-    assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
-    assert.ok(RegExp(`width:\\s*${DEFAULT_WIDTH}`).test(subs));
-    assert.ok(RegExp(`height:\\s*hhh`).test(subs));
+    it("uses iframePath and handles slashes", function () {
+      markup = `Test @{iframe: /${url}}`;
+      Substitute.injectConfig({
+        iframePath: host + '/'
+      });
+      subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{iframe') === -1);
+      assert.ok(/<iframe/.test(subs));
+      assert.ok(RegExp(`src=${quot}${host}${url}${quot}`).test(subs));
+    });
 
-    markup = `Test @{iframe: ${url}:wwww:hhhh}`;
-    Substitute.injectConfig({});
-    subs = Substitute.substitute(markup);
-    assert.ok(subs.indexOf('{iframe') === -1);
-    assert.ok(/<iframe/.test(subs));
-    assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
-    assert.ok(RegExp(`width:\\s*wwww`).test(subs));
-    assert.ok(RegExp(`height:\\s*hhhh`).test(subs));
+    it("uses height when there is no width", function () {
+      markup = `Test @{iframe: ${url}::hhh}`;
+      Substitute.injectConfig({});
+      subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{iframe') === -1);
+      assert.ok(/<iframe/.test(subs));
+      assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
+      assert.ok(RegExp(`width:\\s*${DEFAULT_WIDTH}`).test(subs));
+      assert.ok(RegExp(`height:\\s*hhh`).test(subs));
+    });
 
+    it("uses width and height", function () {
+      markup = `Test @{iframe: ${url}:wwww:hhhh}`;
+      Substitute.injectConfig({});
+      subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{iframe') === -1);
+      assert.ok(/<iframe/.test(subs));
+      assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
+      assert.ok(RegExp(`width:\\s*wwww`).test(subs));
+      assert.ok(RegExp(`height:\\s*hhhh`).test(subs));
+    });
+
+    it("uses selector", function () {
+      markup = `Test @{iframe: ${url}:wwww:hhhh:selector}`;
+      Substitute.injectConfig({});
+      subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{iframe') === -1);
+      assert.ok(/<iframe/.test(subs));
+      assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
+      assert.ok(selectorRegex('selector').test(subs));
+    });
+
+    it("uses selector with colons", function () {
+      markup = `Test @{iframe: ${url}:wwww:hhhh:selector:with:colon}`;
+      Substitute.injectConfig({});
+      subs = Substitute.substitute(markup);
+      assert.ok(subs.indexOf('{iframe') === -1);
+      assert.ok(/<iframe/.test(subs));
+      assert.ok(RegExp(`src=${quot}${url}${quot}`).test(subs));
+      assert.ok(selectorRegex('selector:with:colon').test(subs));
+    });
   });
+
 });

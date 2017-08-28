@@ -150,8 +150,8 @@ Substitute.methods.template = function ( selector = '') {
   }
 };
 
-Substitute.methods.iframe = function ( url = '', width, height) {
-  url = `${this.iframePath}${url.trim()}`.replace(/([^:])\/{2,}/g, "$1/");
+Substitute.methods.iframe = function ( url = '', width, height, ...selectorFragments) {
+  url = `${this.iframePath}${url.trim()}`.replace(/([^:])\/{2,}/g, '$1/');
   // not using default parameters because calling substitution
   // @{iframe:url::111} will pass an empty string to width,
   // which needs one of the below anyway - therefore let's just
@@ -160,9 +160,10 @@ Substitute.methods.iframe = function ( url = '', width, height) {
   height = height || '100vh';
   if (url) {
     var id = `ifrm_${String(Math.random()).substr(3)}`;
-    return `
-    <iframe class="nuclueus-iframe" id="${id}" style="width: ${width}; height: ${height};" src="${url}"></iframe>
+    var html = `
+      <iframe class="nuclueus-iframe" id="${id}" data-markup-selector="${selectorFragments.join(':')}" style="width: ${width}; height: ${height};" src="${url}"></iframe>
     `;
+    return html;
   }
   else {
     Verbose.warn('no_iframe_url', []);

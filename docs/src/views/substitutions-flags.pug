@@ -63,13 +63,13 @@ block content
   div.SG-config
     div.SG-config__row
       div.SG-config__label Substitution
-      div.SG-config__value @{iframe:path:width:height}
+      div.SG-config__value @{iframe:path:width:height:CSS:selectors,with:colons}
     div.SG-config__row
       div.SG-config__label Description
-      div.SG-config__value Includes a document in an iframe. 'path' is either an absolute path, a path relative to where nucleus is being run, or a path appended to the config variable iframePath. Width default is 100%, height is 100vh
+      div.SG-config__value Includes a document in an iframe. 'path' is either an absolute path, a path relative to where nucleus is being run, or a path appended to the config variable iframePath. Width default is 100%, height is 100vh. 'CSS:selectors,with:colons' is a string that can contain colons and tells nucleus where in the document loaded in the iframe to go and find the markup to display / copy. It can be more than one node, simply by using the comma to separate selector. Anything that can be passed to `document.querySelectorAll(xxx)` can be used.
     div.SG-config__row
       div.SG-config__label Example
-      div.SG-config__value @{iframe: /rendered-components/navigation.html:700px:400px}
+      div.SG-config__value @{iframe: /rendered-components/navigation.html:700px:400px:section:first-of-type}
 
   code.code.language-nucleus(data-d-code-preview).
     /**
